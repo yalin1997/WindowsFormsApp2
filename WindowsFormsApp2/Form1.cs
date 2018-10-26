@@ -32,12 +32,20 @@ namespace WindowsFormsApp2
         Graphics g6;
         Graphics g7;
         Graphics g8;
-       
+        int tickUnit;
         private List<IDictionary> dataList = new List<IDictionary>();
         //Microsoft.Office.Interop.Excel.Application ExcelApp;
         private const string Path2 = @"..\";
         private int count=0;
         byte[] buffer = new byte[2048];
+        Class1 deltaChart = new Class1();
+        Class1 thetaChart = new Class1();
+        Class1 lowAlphaChart = new Class1();
+        Class1 highAlphaChart = new Class1();
+        Class1 lowBetaChart = new Class1();
+        Class1 highBetaChart = new Class1();
+        Class1 lowGammaChart = new Class1();
+        Class1 highGammaChart = new Class1();
         int bytesRead;
         byte[] myWriteBuffer = Encoding.ASCII.GetBytes(@"{""enableRawOutput"": false, ""format"": ""Json""}");
         double delta=0;
@@ -51,6 +59,7 @@ namespace WindowsFormsApp2
         public Form1()
         {
             InitializeComponent();
+            tickUnit = paneldelta.Width / 10;
         }
         public String  ParseJSON(string inputJson)
         {
@@ -137,6 +146,14 @@ namespace WindowsFormsApp2
                         highGamma = Int32.Parse(strhighGamma);
                         attention = eSense["attention"].ToString();
                         medition = eSense["meditation"].ToString();
+                        deltaChart.addQueue(delta);
+                        thetaChart.addQueue(theta);
+                        lowAlphaChart.addQueue(lowAlpha);
+                        highAlphaChart.addQueue(highAlpha);
+                        lowBetaChart.addQueue(lowBeta);
+                        highBetaChart.addQueue(highBeta);
+                        lowGammaChart.addQueue(lowGamma);
+                        highGammaChart.addQueue(highGamma);
 
                         paneldelta.Invalidate();
                         panel1.Invalidate();
@@ -275,8 +292,6 @@ namespace WindowsFormsApp2
             label1.Text = "";
             ready=false;
             button1.Enabled = true;
-           
-
         }
         
         /*private void outputExcel()
@@ -320,129 +335,284 @@ namespace WindowsFormsApp2
         {
 
         }
-
         private void paneldelta_Paint(object sender, PaintEventArgs e)
         {
-            g = paneldelta.CreateGraphics();
+            if(button8.Text == "改為折線圖顯示") {
+                g = paneldelta.CreateGraphics();
 
-            int xPoint = (paneldelta.Size.Width / 2) - 10;
+                int xPoint = (paneldelta.Size.Width / 2) - 10;
 
-            double yPoint = delta>= 1000000 ? paneldelta.Size.Height*(0.01): paneldelta.Size.Height * (1-(delta/ 1000000));
-            if (yPoint > 93)
-            {
-                yPoint = 93;
+                double yPoint = delta >= 1000000 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (delta / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+                g.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, paneldelta.Size.Width / 8, (int)(paneldelta.Size.Height - yPoint)));
             }
-
-            g.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, paneldelta.Size.Width / 8, (int)(paneldelta.Size.Height-yPoint )));
+            else
+            {
+                int lastPoint=0;
+                int xPoint=0;
+                g = paneldelta.CreateGraphics();
+                deltaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint-tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
+            
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            g2 = panel1.CreateGraphics();
-
-            int xPoint = (panel1.Size.Width / 2) - 10;
- 
-            double yPoint = theta > 1000000 ? panel1.Size.Height * (0.99) : panel1.Size.Height * (1 - (theta / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g2 = panel1.CreateGraphics();
 
-            g2.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel1.Size.Width / 8, (int)(panel1.Size.Height - yPoint)));
+                int xPoint = (panel1.Size.Width / 2) - 10;
+
+                double yPoint = theta > 1000000 ? panel1.Size.Height * (0.99) : panel1.Size.Height * (1 - (theta / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g2.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel1.Size.Width / 8, (int)(panel1.Size.Height - yPoint)));
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel1.CreateGraphics();
+                thetaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)
         {
-
-            g3 = panel2.CreateGraphics();
-
-            int xPoint = (panel2.Size.Width / 2) - 10;
-
-            double yPoint = lowAlpha > 1000000 ? panel2.Size.Height * (0.99) : panel2.Size.Height * (1 - (lowAlpha / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g3 = panel2.CreateGraphics();
 
-            g3.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel2.Size.Width / 8, (int)(panel2.Size.Height - yPoint)));
+                int xPoint = (panel2.Size.Width / 2) - 10;
+
+                double yPoint = lowAlpha > 1000000 ? panel2.Size.Height * (0.99) : panel2.Size.Height * (1 - (lowAlpha / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g3.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel2.Size.Width / 8, (int)(panel2.Size.Height - yPoint)));
+
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel2.CreateGraphics();
+                lowAlphaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel3_Paint(object sender, PaintEventArgs e)
         {
-
-            g4 = panel3.CreateGraphics();
-
-            int xPoint = (panel3.Size.Width / 2) - 10;
-
-            double yPoint = highAlpha > 1000000 ? panel3.Size.Height * (0.99) : panel3.Size.Height * (1 - (highAlpha / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g4 = panel3.CreateGraphics();
 
-            g4.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel3.Size.Width / 8, (int)(panel3.Size.Height - yPoint)));
+                int xPoint = (panel3.Size.Width / 2) - 10;
+
+                double yPoint = highAlpha > 1000000 ? panel3.Size.Height * (0.99) : panel3.Size.Height * (1 - (highAlpha / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g4.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel3.Size.Width / 8, (int)(panel3.Size.Height - yPoint)));
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel3.CreateGraphics();
+                highAlphaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel4_Paint(object sender, PaintEventArgs e)
         {
-
-            g5 = panel4.CreateGraphics();
-
-            int xPoint = (panel4.Size.Width / 2) - 10;
-
-            double yPoint = lowBeta > 1000000 ? panel4.Size.Height * (0.99) : panel4.Size.Height * (1 - (lowBeta / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g5 = panel4.CreateGraphics();
 
-            g5.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel4.Size.Width / 8, (int)(panel4.Size.Height - yPoint)));
+                int xPoint = (panel4.Size.Width / 2) - 10;
+
+                double yPoint = lowBeta > 1000000 ? panel4.Size.Height * (0.99) : panel4.Size.Height * (1 - (lowBeta / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g5.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel4.Size.Width / 8, (int)(panel4.Size.Height - yPoint)));
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel4.CreateGraphics();
+                lowBetaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel5_Paint(object sender, PaintEventArgs e)
         {
-
-            g6 = panel5.CreateGraphics();
-
-            int xPoint = (paneldelta.Size.Width / 2) - 10;
-
-            double yPoint = highBeta > 1000000 ? panel5.Size.Height * (0.99) : panel5.Size.Height * (1 - (highBeta / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g6 = panel5.CreateGraphics();
 
-            g6.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel5.Size.Width / 8, (int)(panel5.Size.Height - yPoint)));
+                int xPoint = (paneldelta.Size.Width / 2) - 10;
+
+                double yPoint = highBeta > 1000000 ? panel5.Size.Height * (0.99) : panel5.Size.Height * (1 - (highBeta / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g6.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel5.Size.Width / 8, (int)(panel5.Size.Height - yPoint)));
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel5.CreateGraphics();
+                highBetaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel6_Paint(object sender, PaintEventArgs e)
         {
-            g7 = panel6.CreateGraphics();
-
-            int xPoint = (panel6.Size.Width / 2) - 10;
-
-            double yPoint = lowGamma > 1000000 ? panel6.Size.Height * (0.99) : panel6.Size.Height * (1 - (lowGamma / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
+                g7 = panel6.CreateGraphics();
+
+                int xPoint = (panel6.Size.Width / 2) - 10;
+
+                double yPoint = lowGamma > 1000000 ? panel6.Size.Height * (0.99) : panel6.Size.Height * (1 - (lowGamma / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g7.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel6.Size.Width / 8, (int)(panel6.Size.Height - yPoint)));
             }
- 
-            g7.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel6.Size.Width / 8, (int)(panel6.Size.Height - yPoint)));
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel6.CreateGraphics();
+                lowGammaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
 
         private void panel7_Paint(object sender, PaintEventArgs e)
         {
-            g8 = panel7.CreateGraphics();
-
-            int xPoint = (panel7.Size.Width / 2) - 10;
-
-            double yPoint = highGamma > 1000000 ? panel7.Size.Height * (0.99) : panel7.Size.Height * (1 - (highGamma / 1000000));
-            if (yPoint > 93)
+            if (button8.Text == "改為折線圖顯示")
             {
-                yPoint = 93;
-            }
+                g8 = panel7.CreateGraphics();
 
-            g8.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel7.Size.Width / 8, (int)(panel7.Size.Height - yPoint)));
+                int xPoint = (panel7.Size.Width / 2) - 10;
+
+                double yPoint = highGamma > 1000000 ? panel7.Size.Height * (0.99) : panel7.Size.Height * (1 - (highGamma / 1000000));
+                if (yPoint > 93)
+                {
+                    yPoint = 93;
+                }
+
+                g8.DrawRectangle(bluePen, new System.Drawing.Rectangle(xPoint, (int)yPoint, panel7.Size.Width / 8, (int)(panel7.Size.Height - yPoint)));
+            }
+            else
+            {
+                int lastPoint = 0;
+                int xPoint = 0;
+                g = panel7.CreateGraphics();
+                highGammaChart.getList().ForEach(action: x =>
+                {
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    lastPoint = yPoint;
+                    xPoint += tickUnit;
+                });
+            }
         }
         /*private void ExcelOutPut()
         {
@@ -539,6 +709,11 @@ namespace WindowsFormsApp2
             button4.Enabled = true;
             button5.Enabled = true;
             button3.Enabled = true;
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            button8.Text = "改為長條圖顯示";
         }
     }
 }
