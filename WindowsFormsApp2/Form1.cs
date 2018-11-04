@@ -56,9 +56,14 @@ namespace WindowsFormsApp2
         double highBeta = 0;
         double lowGamma = 0;
         double highGamma = 0;
-        public Form1()
+        private string name;
+        private string year;
+
+        public Form1(string name ,string year)
         {
             InitializeComponent();
+            this.name = name;
+            this.year = year;
             tickUnit = paneldelta.Width / 10;
         }
         public String  ParseJSON(string inputJson)
@@ -114,15 +119,15 @@ namespace WindowsFormsApp2
                         });
                         if (signal < 200 && signal > 0)
                         {
-                            pictureBox1.Image = Image.FromFile("D:\\專題\\connecting2_v2.png");
+                            pictureBox1.Image = Image.FromFile(Path2 + "connecting2_v2.png");
                         }
                         else if (signal >= 200)
                         {
-                            pictureBox1.Image = Image.FromFile("D:\\專題\\nosignal_v2.png");
+                            pictureBox1.Image = Image.FromFile(Path2 +"nosignal_v2.png");
                         }
                         else
                         {
-                            pictureBox1.Image = Image.FromFile("D:\\專題\\connected_v2.png");
+                            pictureBox1.Image = Image.FromFile(Path2+"connected_v2.png");
                         }
 
                         IDictionary EegPower = (IDictionary)JsonConvert.Import(typeof(IDictionary), data["eegPower"].ToString());
@@ -251,7 +256,7 @@ namespace WindowsFormsApp2
                         {
                             int i = 0;
                             String tempText;
-                            using(DataSaver saver = new DataSaver(Path2 + "Data_for_learn_"+count+".txt"))
+                            using(DataSaver saver = new DataSaver(Path2 + name+year+count+".txt"))
                             {
                                 while (dataList.Count <= Times || infinity)
                                 {
@@ -351,20 +356,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint=0;
-                int xPoint=0;
-                g = paneldelta.CreateGraphics();
-                deltaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = paneldelta.CreateGraphics();
+                    List<double> tempArr = deltaChart.getList();
+                    tempArr.ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint-tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch  (InvalidOperationException ex)
+                {
+
+                }
             }
             
         }
@@ -387,20 +400,27 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel1.CreateGraphics();
-                thetaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel1.CreateGraphics();
+                    thetaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
 
@@ -423,20 +443,27 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel2.CreateGraphics();
-                lowAlphaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel2.CreateGraphics();
+                    lowAlphaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
 
@@ -458,20 +485,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel3.CreateGraphics();
-                highAlphaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel3.CreateGraphics();
+                    highAlphaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+               
             }
         }
 
@@ -493,20 +528,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel4.CreateGraphics();
-                lowBetaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel4.CreateGraphics();
+                    lowBetaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+               
             }
         }
 
@@ -528,20 +571,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel5.CreateGraphics();
-                highBetaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel5.CreateGraphics();
+                    highBetaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                
             }
         }
 
@@ -563,20 +614,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel6.CreateGraphics();
-                lowGammaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel6.CreateGraphics();
+                    lowGammaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+              
             }
         }
 
@@ -598,20 +657,28 @@ namespace WindowsFormsApp2
             }
             else
             {
-                int lastPoint = 0;
-                int xPoint = 0;
-                g = panel7.CreateGraphics();
-                highGammaChart.getList().ForEach(action: x =>
+                try
                 {
-                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                    if (yPoint > 93)
+                    int lastPoint = 0;
+                    int xPoint = 0;
+                    g = panel7.CreateGraphics();
+                    highGammaChart.getList().ForEach(action: x =>
                     {
-                        yPoint = 93;
-                    }
-                    g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
-                    lastPoint = yPoint;
-                    xPoint += tickUnit;
-                });
+                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                        if (yPoint > 93)
+                        {
+                            yPoint = 93;
+                        }
+                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                        lastPoint = yPoint;
+                        xPoint += tickUnit;
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+               
             }
         }
         /*private void ExcelOutPut()
@@ -713,7 +780,16 @@ namespace WindowsFormsApp2
 
         private void button8_Click(object sender, EventArgs e)
         {
-            button8.Text = "改為長條圖顯示";
+            if (button8.Text != "改為長條圖顯示")
+            {
+                button8.Text = "改為長條圖顯示";
+                label1.Text = "已變更折線圖顯示";
+            }
+            else
+            {
+                button8.Text = "改為折線圖顯示";
+                label1.Text = "已變更長條圖顯示";
+            }
         }
     }
 }

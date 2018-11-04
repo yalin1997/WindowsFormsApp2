@@ -19,7 +19,7 @@ namespace WindowsFormsApp2
             {
                 lock (outputQueue)
                 {
-                if (outputQueue.Count == 10)
+                    if (outputQueue.Count == 10)
                     {
                         outputQueue.RemoveAt(0);
                         outputQueue.Add(input);
