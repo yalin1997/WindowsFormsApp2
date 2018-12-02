@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net;
 using System.Net.Sockets;
-using Jayrock.Json;
 using Jayrock.Json.Conversion;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Office.Interop.Excel;
+
+using System.Diagnostics;
+using System.Threading;
 
 namespace WindowsFormsApp2
 {
@@ -35,7 +35,7 @@ namespace WindowsFormsApp2
         int tickUnit;
         private List<IDictionary> dataList = new List<IDictionary>();
         //Microsoft.Office.Interop.Excel.Application ExcelApp;
-        private const string Path2 = @"..\";
+        private string Path2 = @"..\" ;
         private int count=0;
         byte[] buffer = new byte[2048];
         Class1 deltaChart = new Class1();
@@ -209,6 +209,38 @@ namespace WindowsFormsApp2
                         {
                             label22.Text = eSense["meditation"].ToString();
                         });
+                        label24.InvokeIfRequired(() =>
+                        {
+                            label24.Text=deltaChart.getAverage().ToString();
+                        });
+                        label25.InvokeIfRequired(() =>
+                        {
+                            label25.Text = thetaChart.getAverage().ToString();
+                        });
+                        label26.InvokeIfRequired(() =>
+                        {
+                            label26.Text = lowAlphaChart.getAverage().ToString();
+                        });
+                        label27.InvokeIfRequired(() =>
+                        {
+                            label27.Text = highAlphaChart.getAverage().ToString();
+                        });
+                        label28.InvokeIfRequired(() =>
+                        {
+                            label28.Text = lowBetaChart.getAverage().ToString();
+                        });
+                        label29.InvokeIfRequired(() =>
+                        {
+                            label29.Text = highBetaChart.getAverage().ToString();
+                        });
+                        label30.InvokeIfRequired(() =>
+                        {
+                            label30.Text = lowGammaChart.getAverage().ToString();
+                        });
+                        label31.InvokeIfRequired(() =>
+                        {
+                            label31.Text = highGammaChart.getAverage().ToString();
+                        });
                         String returnStr = String.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} ", strDelta, strTheta, strlowAlpha, strhighAlpha, strlowBeta, strhighBeta, strlowGamma, strhighGamma, attention, medition);
                         returnStr += String.Format("{0} {1} {2}", data["poorSignalLevel"], data["Time"], data["Emotion"]);
                         return returnStr;
@@ -229,9 +261,56 @@ namespace WindowsFormsApp2
                 return "";
             }
         }
-  
+ 
+        public static void WriteLog(string message)
+        {
+            string DIRNAME = AppDomain.CurrentDomain.BaseDirectory + @"\Log\";
+            string FILENAME = DIRNAME + DateTime.Now.ToString("yyyyMMdd") + ".txt";
+
+            if (!Directory.Exists(DIRNAME))
+                Directory.CreateDirectory(DIRNAME);
+
+            if (!File.Exists(FILENAME))
+            {
+                // The File.Create method creates the file and opens a FileStream on the file. You neeed to close it.
+                File.Create(FILENAME).Close();
+            }
+            using (StreamWriter sw = File.AppendText(FILENAME))
+            {
+                Log(message, sw);
+            }
+        }
+
+        private static void Log(string logMessage, TextWriter w)
+        {
+            w.Write("\r\nLog Entry : ");
+            w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
+            w.WriteLine("  :");
+            w.WriteLine("  :{0}", logMessage);
+            w.WriteLine("-------------------------------");
+        }
+        private Boolean openConnector()
+        {
+            Boolean createNew;
+            using (Mutex mutex = new Mutex(true, "ThinkGear Connector", out createNew))
+            {
+                if (createNew)
+                {
+                    Process Connector = new Process();
+                    Connector.StartInfo.FileName = System.AppDomain.CurrentDomain.BaseDirectory + @"ThinkGear Connector\win32\ThinkGear Connector.exe";
+                    return Connector.Start();
+                }
+                else
+                {
+                    Thread.Sleep(1000);
+                    return true;
+                }
+            }
+
+        }
         private async void button1_Click(object sender, EventArgs e)
         {
+                WriteLog("start connect!");
                 button1.Enabled=false;
                 count++;
                 ready = true;
@@ -244,44 +323,53 @@ namespace WindowsFormsApp2
                 Task t =Task.Run(() => { 
                     try
                     {
-                        tcpClient = new TcpClient("127.0.0.1", 13854);
-                        stream = tcpClient.GetStream();
-                        // Sending configuration packet to TGC              
-                        if (stream.CanWrite)
+                        if (openConnector())
                         {
-                            stream.Write(myWriteBuffer, 0, myWriteBuffer.Length);
-                        }
-                        //start Reading
-                        if (stream.CanRead)
-                        {
-                            int i = 0;
-                            String tempText;
-                            using(DataSaver saver = new DataSaver(Path2 + name+year+count+".txt"))
+                            tcpClient = new TcpClient("127.0.0.1", 13854);
+                            stream = tcpClient.GetStream();
+                            // Sending configuration packet to TGC              
+                            if (stream.CanWrite)
                             {
-                                while (dataList.Count <= Times || infinity)
+                                stream.Write(myWriteBuffer, 0, myWriteBuffer.Length);
+                            }
+                            //start Reading
+                            if (stream.CanRead)
+                            {
+                                int i = 0;
+                                String tempText;
+                                using (DataSaver saver = new DataSaver(Path2 + name + year + "_"+count + ".txt"))
                                 {
-                                    if (!ready)
+                                    // eegDB SQLiteDB = eegDB._instance;
+                                    //string SQL_command = "CREATE TABLE EegData('欄位 1'  '欄位 1 資料種類','欄位 2'  '欄位 2 資料種類');";
+                                    while (dataList.Count <= Times || infinity)
                                     {
-                                        break;
-                                    }
-                                    // This should really be in it's own thread                   
-                                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                                    string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
-                                    foreach (string json in packets)
-                                    {
-                                        tempText=ParseJSON(json.Trim());
-                                        if (tempText != "") {
-                                            Console.WriteLine(tempText);
-                                            saver.AddData(tempText);
+                                        if (!ready)
+                                        {
+                                            break;
                                         }
+                                        // This should really be in it's own thread                   
+                                        bytesRead = stream.Read(buffer, 0, buffer.Length);
+                                        string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
+                                        foreach (string json in packets)
+                                        {
+                                            tempText = ParseJSON(json.Trim());
+                                            if (tempText != "")
+                                            {
+                                                saver.AddData(tempText);
+                                                if (checkBox1.CheckState == CheckState.Checked)
+                                                {
+                                                    //SQLiteDB.ExecuteCommamd(SQL_command);
+                                                }
+                                            }
+                                        }
+                                        i++;
                                     }
-                                    i++;
                                 }
                             }
                         }
                     }
                     catch (SocketException se) {
-                        Console.WriteLine(se.ToString());
+                        WriteLog(se.ToString());
                     }
                 });
             await t;
@@ -294,29 +382,11 @@ namespace WindowsFormsApp2
 
         private void button2_Click(object sender, EventArgs e)
         {
-            label1.Text = "";
+            label1.Text = "停止";
             ready=false;
             button1.Enabled = true;
         }
         
-        /*private void outputExcel()
-        {
-            for(int i = 0; i < dataList.Count; i++)
-            {
-                IDictionary temp = dataList[i];
-                IDictionary EegTemp = (IDictionary)JsonConvert.Import(typeof(IDictionary), temp["eegPower"].ToString());
-                ExcelApp.Cells[i + 2, 1] = EegTemp["delta"];
-                ExcelApp.Cells[i + 2, 2] = EegTemp["theta"];
-                ExcelApp.Cells[i + 2, 3] = EegTemp["lowAlpha"];
-                ExcelApp.Cells[i + 2, 4] = EegTemp["highAlpha"];
-                ExcelApp.Cells[i + 2, 5] = EegTemp["lowBeta"];
-                ExcelApp.Cells[i + 2, 6] = EegTemp["highBeta"];
-                ExcelApp.Cells[i + 2, 7] = EegTemp["lowGamma"];
-                ExcelApp.Cells[i + 2, 8] = EegTemp["highGamma"];
-                ExcelApp.Cells[i + 2, 8] = temp["poorSignalLevel"];
-            }
-
-        }*/
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -376,7 +446,7 @@ namespace WindowsFormsApp2
                 }
                 catch  (InvalidOperationException ex)
                 {
-
+                    WriteLog(ex.ToString());
                 }
             }
             
@@ -419,7 +489,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
             }
         }
@@ -462,7 +532,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
             }
         }
@@ -504,7 +574,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
                
             }
@@ -547,7 +617,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
                
             }
@@ -590,7 +660,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
                 
             }
@@ -633,7 +703,7 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
               
             }
@@ -676,32 +746,12 @@ namespace WindowsFormsApp2
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    WriteLog(ex.ToString());
                 }
                
             }
         }
-        /*private void ExcelOutPut()
-        {
-            ExcelApp = new Microsoft.Office.Interop.Excel.Application();
-            ExcelApp.DisplayAlerts = false;
-
-            Workbook Excel_WB = ExcelApp.Workbooks.Add(XlWBATemplate.xlWBATWorksheet);
-            Worksheet WS1 = (Worksheet)Excel_WB.Worksheets[1];
-            WS1.Name = "腦波資料";
-            WS1.Activate();
-            ExcelApp.Cells[1, 1] = "Delta";
-            ExcelApp.Cells[1, 2] = "Theta";
-            ExcelApp.Cells[1, 3] = "Low Alpha";
-            ExcelApp.Cells[1, 4] = "High Alpha";
-            ExcelApp.Cells[1, 5] = "Low Beta";
-            ExcelApp.Cells[1, 6] = "High Beta";
-            ExcelApp.Cells[1, 7] = "Low Gamma";
-            ExcelApp.Cells[1, 8] = "High Gamma";
-            ExcelApp.Cells[1, 9] = "訊號品質";
-            outputExcel();
-            Excel_WB.SaveAs("D:\\專題", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-        }*/
+      
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             
@@ -790,6 +840,11 @@ namespace WindowsFormsApp2
                 button8.Text = "改為折線圖顯示";
                 label1.Text = "已變更長條圖顯示";
             }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            checkBox1.CheckState = CheckState.Unchecked;
         }
     }
 }

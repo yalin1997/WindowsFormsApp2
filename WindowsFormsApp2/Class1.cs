@@ -31,6 +31,10 @@ namespace WindowsFormsApp2
                 }
             });
         }
+        public int getAverage()
+        {
+            return (int)outputQueue.Average();
+        }
         public void Dispose()
         {
             outputQueue = null;
