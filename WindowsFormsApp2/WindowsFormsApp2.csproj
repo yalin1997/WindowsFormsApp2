@@ -111,6 +111,7 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="DataSaver.cs" />
+    <Compile Include="DeepLearn_Connector.cs" />
     <Compile Include="eegDB.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

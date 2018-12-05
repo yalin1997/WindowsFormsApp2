@@ -85,10 +85,10 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(179, 9);
+            this.button1.Location = new System.Drawing.Point(307, 3);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(121, 31);
+            this.button1.Size = new System.Drawing.Size(121, 37);
             this.button1.TabIndex = 0;
             this.button1.Text = "開始連線";
             this.button1.UseVisualStyleBackColor = true;
@@ -176,10 +176,10 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(179, 41);
+            this.button2.Location = new System.Drawing.Point(432, 4);
             this.button2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(121, 31);
+            this.button2.Size = new System.Drawing.Size(121, 36);
             this.button2.TabIndex = 14;
             this.button2.Text = "停止";
             this.button2.UseVisualStyleBackColor = true;
@@ -279,7 +279,7 @@
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(1292, 15);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(68, 62);
             this.pictureBox1.TabIndex = 28;
@@ -367,7 +367,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(25, 8);
+            this.textBox1.Location = new System.Drawing.Point(138, 8);
             this.textBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(147, 25);
@@ -416,7 +416,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(579, 560);
+            this.button3.Location = new System.Drawing.Point(486, 562);
             this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(91, 32);
@@ -427,7 +427,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(675, 562);
+            this.button4.Location = new System.Drawing.Point(592, 563);
             this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(105, 32);
@@ -438,7 +438,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(785, 562);
+            this.button5.Location = new System.Drawing.Point(708, 562);
             this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(100, 32);
@@ -449,7 +449,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(891, 562);
+            this.button6.Location = new System.Drawing.Point(814, 563);
             this.button6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(95, 32);
@@ -460,7 +460,7 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(991, 562);
+            this.button7.Location = new System.Drawing.Point(915, 563);
             this.button7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(88, 32);
@@ -471,8 +471,8 @@
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(1223, 564);
-            this.button8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button8.Location = new System.Drawing.Point(560, 7);
+            this.button8.Margin = new System.Windows.Forms.Padding(4);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(137, 31);
             this.button8.TabIndex = 47;
@@ -485,8 +485,8 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(25, 41);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBox1.Location = new System.Drawing.Point(12, 10);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(4);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(119, 19);
             this.checkBox1.TabIndex = 48;

@@ -350,18 +350,20 @@ namespace WindowsFormsApp2
                                         // This should really be in it's own thread                   
                                         bytesRead = stream.Read(buffer, 0, buffer.Length);
                                         string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
-                                        foreach (string json in packets)
-                                        {
-                                            tempText = ParseJSON(json.Trim());
-                                            if (tempText != "")
+
+                                            foreach (string json in packets)
                                             {
-                                                saver.AddData(tempText);
-                                                if (checkBox1.CheckState == CheckState.Checked)
+                                                tempText = ParseJSON(json.Trim());
+                                                if (tempText != "")
                                                 {
-                                                    //SQLiteDB.ExecuteCommamd(SQL_command);
+                                                    saver.AddData(tempText);
+                                                    if (checkBox1.CheckState == CheckState.Checked)
+                                                    {
+                                                        //SQLiteDB.ExecuteCommamd(SQL_command);
+                                                    }
                                                 }
                                             }
-                                        }
+                                        
                                         i++;
                                     }
                                 }
