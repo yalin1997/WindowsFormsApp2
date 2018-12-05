@@ -48,6 +48,7 @@ namespace WindowsFormsApp2
         Class1 highGammaChart = new Class1();
         int bytesRead;
         byte[] myWriteBuffer = Encoding.ASCII.GetBytes(@"{""enableRawOutput"": false, ""format"": ""Json""}");
+        Queue<String> SendQueue = new Queue<String>();
         double delta=0;
         double theta=0;
         double lowAlpha=0;
@@ -350,20 +351,22 @@ namespace WindowsFormsApp2
                                         // This should really be in it's own thread                   
                                         bytesRead = stream.Read(buffer, 0, buffer.Length);
                                         string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
-
                                             foreach (string json in packets)
                                             {
                                                 tempText = ParseJSON(json.Trim());
                                                 if (tempText != "")
                                                 {
                                                     saver.AddData(tempText);
+                                                    lock (SendQueue)
+                                                    {
+                                                        SendQueue.Enqueue(tempText);
+                                                    }
                                                     if (checkBox1.CheckState == CheckState.Checked)
                                                     {
-                                                        //SQLiteDB.ExecuteCommamd(SQL_command);
+                                                    //SQLiteDB.ExecuteCommamd(SQL_command);
                                                     }
                                                 }
                                             }
-                                        
                                         i++;
                                     }
                                 }
@@ -374,6 +377,33 @@ namespace WindowsFormsApp2
                         WriteLog(se.ToString());
                     }
                 });
+            Task SendTask = Task.Run(() =>
+            {
+                using(DeepLearn_Connector DC = new DeepLearn_Connector("127.0.0.1", 8080))
+                {
+                    while (dataList.Count <= Times || infinity)
+                    {
+                        if (!ready)
+                        {
+                            break;
+                        }
+                        String brainData = "";
+                        lock (SendQueue)
+                        {
+                            if (SendQueue.Count >= 5)
+                            {
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    brainData += SendQueue.Dequeue();
+                                }
+                                 DC.sendData(brainData);
+                            }
+                        }
+                        DC.setReader();
+                        Console.WriteLine(DC.receiveResult());
+                    }
+                }
+            });
             await t;
             if (tcpClient != null)
             {
