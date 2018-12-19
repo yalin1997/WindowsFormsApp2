@@ -359,7 +359,7 @@ namespace WindowsFormsApp2
                                                     saver.AddData(tempText);
                                                     lock (SendQueue)
                                                     {
-                                                        SendQueue.Enqueue(tempText);
+                                                        SendQueue.Enqueue(tempText+"\n");
                                                     }
                                                     if (checkBox1.CheckState == CheckState.Checked)
                                                     {
@@ -379,7 +379,7 @@ namespace WindowsFormsApp2
                 });
             Task SendTask = Task.Run(() =>
             {
-                using(DeepLearn_Connector DC = new DeepLearn_Connector("127.0.0.1", 8080))
+                using(DeepLearn_Connector DC = new DeepLearn_Connector("192.168.2.116", 8888))
                 {
                     while (dataList.Count <= Times || infinity)
                     {
@@ -396,6 +396,7 @@ namespace WindowsFormsApp2
                                 {
                                     brainData += SendQueue.Dequeue();
                                 }
+                                Console.Write("TCP Message:"+brainData);
                                  DC.sendData(brainData);
                             }
                         }
