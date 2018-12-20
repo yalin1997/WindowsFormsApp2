@@ -379,7 +379,7 @@ namespace WindowsFormsApp2
                 });
             Task SendTask = Task.Run(() =>
             {
-                using(DeepLearn_Connector DC = new DeepLearn_Connector("192.168.2.116", 8888))
+                using(DeepLearn_Connector DC = new DeepLearn_Connector("192.168.1.35", 8888))
                 {
                     while (dataList.Count <= Times || infinity)
                     {
