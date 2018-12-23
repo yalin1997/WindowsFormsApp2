@@ -370,13 +370,13 @@ namespace WindowsFormsApp2
                                                             for (int k = 0; k < 5; k++)
                                                             {
                                                                 brainData += SendQueue.Dequeue();
-                                                                Console.WriteLine("brainData:" + brainData);
                                                             }
                                                             if (isConncted)
                                                             {
                                                                 DC.sendData(brainData);
+                                                                Console.WriteLine("TCP Message sended:" + brainData);
                                                             }
-                                                            Console.WriteLine("TCP Message sended:" + brainData);
+                                                           
                                                         }
                                                 }
                                             }
@@ -393,7 +393,9 @@ namespace WindowsFormsApp2
                         checkBox1.InvokeIfRequired(() =>
                         {
                             checkBox1.CheckState = CheckState.Unchecked;
+                            label1.Text = "已經取消連接Server，請重新連線";
                         });
+
                     }
                 });
          
@@ -770,7 +772,7 @@ namespace WindowsFormsApp2
                         
                         lastPoint = yPoint;
                         xPoint += tickUnit;
-                        xPoint = xPoint >= label7.Width ? label7.Width : xPoint;
+                        xPoint = xPoint >= panel7.Size.Width ? panel7.Size.Width : xPoint;
                     });
                 }
                 catch (InvalidOperationException ex)
