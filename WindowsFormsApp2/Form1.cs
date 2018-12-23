@@ -34,7 +34,7 @@ namespace WindowsFormsApp2
         Graphics g8;
         int tickUnit;
         private List<IDictionary> dataList = new List<IDictionary>();
-        //Microsoft.Office.Interop.Excel.Application ExcelApp;
+
         private string Path2 = @"..\" ;
         private int count=0;
         byte[] buffer = new byte[2048];
@@ -315,6 +315,7 @@ namespace WindowsFormsApp2
                 button1.Enabled=false;
                 count++;
                 ready = true;
+            bool isConncted = false;
                 int Times = Int32.Parse(textBox1.Text == "" ? "0" : textBox1.Text);
                  Boolean infinity = false;
                 if (Times == 0)
@@ -340,71 +341,62 @@ namespace WindowsFormsApp2
                                 String tempText;
                                 using (DataSaver saver = new DataSaver(Path2 + name + year + "_"+count + ".txt"))
                                 {
-                                    // eegDB SQLiteDB = eegDB._instance;
-                                    //string SQL_command = "CREATE TABLE EegData('欄位 1'  '欄位 1 資料種類','欄位 2'  '欄位 2 資料種類');";
-                                    while (dataList.Count <= Times || infinity)
+                                    DeepLearn_Connector DC = new DeepLearn_Connector();
+                                    if (checkBox1.CheckState == CheckState.Checked)
                                     {
-                                        if (!ready)
+                                        isConncted = DC.Start_Connect("192.168.10.166", 8888);
+                                    }
+                                        while (dataList.Count <= Times || infinity)
                                         {
-                                            break;
-                                        }
-                                        // This should really be in it's own thread                   
-                                        bytesRead = stream.Read(buffer, 0, buffer.Length);
-                                        string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
+                                            if (!ready)
+                                            {
+                                                break;
+                                            }
+                                            // This should really be in it's own thread                   
+                                            bytesRead = stream.Read(buffer, 0, buffer.Length);
+                                            string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
                                             foreach (string json in packets)
                                             {
                                                 tempText = ParseJSON(json.Trim());
+
                                                 if (tempText != "")
                                                 {
                                                     saver.AddData(tempText);
-                                                    lock (SendQueue)
-                                                    {
-                                                        SendQueue.Enqueue(tempText+"\n");
-                                                    }
-                                                    if (checkBox1.CheckState == CheckState.Checked)
-                                                    {
-                                                    //SQLiteDB.ExecuteCommamd(SQL_command);
-                                                    }
+
+                                                        SendQueue.Enqueue(tempText + "\n");
+                                                        if (SendQueue.Count >= 5)
+                                                        {
+                                                            string brainData = "";
+                                                            for (int k = 0; k < 5; k++)
+                                                            {
+                                                                brainData += SendQueue.Dequeue();
+                                                                Console.WriteLine("brainData:" + brainData);
+                                                            }
+                                                            if (isConncted)
+                                                            {
+                                                                DC.sendData(brainData);
+                                                            }
+                                                            Console.WriteLine("TCP Message sended:" + brainData);
+                                                        }
                                                 }
                                             }
-                                        i++;
-                                    }
+                                            i++;
+                                        }
+                                    DC.Dispose();
                                 }
                             }
                         }
                     }
                     catch (SocketException se) {
                         WriteLog(se.ToString());
+                        Console.WriteLine(se.ToString());
+                        checkBox1.InvokeIfRequired(() =>
+                        {
+                            checkBox1.CheckState = CheckState.Unchecked;
+                        });
                     }
                 });
-            Task SendTask = Task.Run(() =>
-            {
-                using(DeepLearn_Connector DC = new DeepLearn_Connector("192.168.1.35", 8888))
-                {
-                    while (dataList.Count <= Times || infinity)
-                    {
-                        if (!ready)
-                        {
-                            break;
-                        }
-                        String brainData = "";
-                        lock (SendQueue)
-                        {
-                            if (SendQueue.Count >= 5)
-                            {
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    brainData += SendQueue.Dequeue();
-                                }
-                                Console.Write("TCP Message:"+brainData);
-                                 DC.sendData(brainData);
-                            }
-                        }
-                        DC.setReader();
-                        Console.WriteLine(DC.receiveResult());
-                    }
-                }
-            });
+         
             await t;
             if (tcpClient != null)
             {
@@ -767,19 +759,28 @@ namespace WindowsFormsApp2
                     g = panel7.CreateGraphics();
                     highGammaChart.getList().ForEach(action: x =>
                     {
-                        int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
-                        if (yPoint > 93)
-                        {
-                            yPoint = 93;
-                        }
-                        g.DrawLine(bluePen, new System.Drawing.Point((xPoint - tickUnit), lastPoint), new System.Drawing.Point(xPoint, yPoint));
+                    int yPoint = (int)(Math.Log10(x) >= 7 ? paneldelta.Size.Height * (0.01) : paneldelta.Size.Height * (1 - (Math.Log10(x) / 7)));
+                    if (yPoint > 93)
+                    {
+                        yPoint = 93;
+                    }
+                        Point point1 = new Point((xPoint - tickUnit),lastPoint);
+                        Point point2 = new Point(xPoint, yPoint);
+                        g.DrawLine(bluePen, point1, point2);
+                        
                         lastPoint = yPoint;
                         xPoint += tickUnit;
+                        xPoint = xPoint >= label7.Width ? label7.Width : xPoint;
                     });
                 }
                 catch (InvalidOperationException ex)
                 {
                     WriteLog(ex.ToString());
+                }
+                catch (OverflowException over)
+                {
+                    WriteLog(over.ToString());
+                    Console.WriteLine(over.ToString());
                 }
                
             }

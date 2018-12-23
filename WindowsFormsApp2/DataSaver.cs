@@ -44,7 +44,6 @@ namespace WindowsFormsApp2
 
                             if (nextString != null)
                             {
-                                Console.WriteLine("Q:" + nextString);
                                 saver.WriteLine(nextString);
                             }
                         }

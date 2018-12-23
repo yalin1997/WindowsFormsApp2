@@ -15,13 +15,21 @@ namespace WindowsFormsApp2
         NetworkStream stream;
         BinaryReader br;
 
-        public DeepLearn_Connector(String IP , Int32 port)
+        public DeepLearn_Connector()
+        {
+            connector = new TcpClient();
+        }
+        public Boolean Start_Connect(string IP, int port)
         {
             IPAddress ip = IPAddress.Parse(IP);
             IPEndPoint iPAddress = new IPEndPoint(ip, port);
-            connector = new TcpClient(iPAddress);
+            connector.Connect(iPAddress);
+            if (connector.Connected)
+            {
+                stream = connector.GetStream();
+            }
+            return connector.Connected;
         }
-
         public void Dispose()
         {
             stream.Close();
@@ -30,11 +38,11 @@ namespace WindowsFormsApp2
 
         public void sendData(string BrainData)
         {
-            Task sendT= Task.Run(()=>{
-                Byte[] data = Encoding.Unicode.GetBytes(BrainData);
-                stream = connector.GetStream();
+            if (stream.CanWrite)
+            {
+                byte[] data = Encoding.Unicode.GetBytes(BrainData);
                 stream.Write(data, 0, data.Length);
-            });
+            }
         }
         public void setReader()
         {
@@ -45,7 +53,7 @@ namespace WindowsFormsApp2
             else
             {
                 stream = connector.GetStream();
-                setReader();
+               // this.setReader();
             }
         }
         public string receiveResult()
