@@ -13,7 +13,6 @@ namespace WindowsFormsApp2
     {
         TcpClient connector;
         NetworkStream stream;
-        BinaryReader br;
 
         public DeepLearn_Connector()
         {
@@ -40,7 +39,7 @@ namespace WindowsFormsApp2
         {
             if (stream.CanWrite)
             {
-                byte[] data = Encoding.Unicode.GetBytes(BrainData);
+                byte[] data = Encoding.UTF8.GetBytes(BrainData);
                 stream.Write(data, 0, data.Length);
             }
         }
@@ -48,27 +47,27 @@ namespace WindowsFormsApp2
         {
             if (stream.CanRead)
             {
-                br = new BinaryReader(stream);
+                Console.WriteLine("can start");
             }
             else
             {
                 stream = connector.GetStream();
-               // this.setReader();
+                setReader();
             }
         }
         public string receiveResult()
         {
-            string receive = null;
+            byte[] receive =new byte[1];
             try
                 {
-                    receive = br.ReadString();
-                     return receive;
+                    stream.Read(receive,0,receive.Length);
+                    string pack=Encoding.UTF8.GetString(receive);
+                     return pack;
                 }
                 catch
                 {
-                receive = "接收失敗";
-                return receive;
-            }
+                    return "接收失敗";
+                }
         }
     }
 }

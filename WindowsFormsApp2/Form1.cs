@@ -21,6 +21,7 @@ namespace WindowsFormsApp2
     {
         Stream stream;
         TcpClient tcpClient;
+        DeepLearn_Connector DC = new DeepLearn_Connector();
         Boolean ready;
         //Task rawEgg;
         Pen bluePen = new Pen(Color.Blue);
@@ -48,7 +49,7 @@ namespace WindowsFormsApp2
         Class1 highGammaChart = new Class1();
         int bytesRead;
         byte[] myWriteBuffer = Encoding.ASCII.GetBytes(@"{""enableRawOutput"": false, ""format"": ""Json""}");
-        Queue<String> SendQueue = new Queue<String>();
+        filter<string> SendQueue = new filter<string>();
         double delta=0;
         double theta=0;
         double lowAlpha=0;
@@ -152,14 +153,14 @@ namespace WindowsFormsApp2
                         highGamma = Int32.Parse(strhighGamma);
                         attention = eSense["attention"].ToString();
                         medition = eSense["meditation"].ToString();
-                        deltaChart.addQueue(delta);
-                        thetaChart.addQueue(theta);
-                        lowAlphaChart.addQueue(lowAlpha);
-                        highAlphaChart.addQueue(highAlpha);
-                        lowBetaChart.addQueue(lowBeta);
-                        highBetaChart.addQueue(highBeta);
-                        lowGammaChart.addQueue(lowGamma);
-                        highGammaChart.addQueue(highGamma);
+                        deltaChart.addQueue(delta,10);
+                        thetaChart.addQueue(theta, 10);
+                        lowAlphaChart.addQueue(lowAlpha, 10);
+                        highAlphaChart.addQueue(highAlpha, 10);
+                        lowBetaChart.addQueue(lowBeta, 10);
+                        highBetaChart.addQueue(highBeta, 10);
+                        lowGammaChart.addQueue(lowGamma, 10);
+                        highGammaChart.addQueue(highGamma, 10);
 
                         paneldelta.Invalidate();
                         panel1.Invalidate();
@@ -341,12 +342,11 @@ namespace WindowsFormsApp2
                                 String tempText;
                                 using (DataSaver saver = new DataSaver(Path2 + name + year + "_"+count + ".txt"))
                                 {
-                                    DeepLearn_Connector DC = new DeepLearn_Connector();
-                                    if (checkBox1.CheckState == CheckState.Checked)
+                                    if (checkBox1.CheckState == CheckState.Checked && !isConncted)
                                     {
                                         isConncted = DC.Start_Connect("192.168.10.166", 8888);
                                     }
-                                        while (dataList.Count <= Times || infinity)
+                                    while (dataList.Count <= Times || infinity)
                                         {
                                             if (!ready)
                                             {
@@ -363,26 +363,58 @@ namespace WindowsFormsApp2
                                                 {
                                                     saver.AddData(tempText);
 
-                                                        SendQueue.Enqueue(tempText + "\n");
-                                                        if (SendQueue.Count >= 5)
+                                                    SendQueue.addQueue(tempText + "\n",5);
+                                                    if (SendQueue.Count >= 5)
+                                                    {
+                                                        string brainData;
+                                                        brainData = SendQueue.Dequeue();
+                                                        if (isConncted)
                                                         {
-                                                            string brainData = "";
-                                                            for (int k = 0; k < 5; k++)
+                                                            DC.sendData(brainData);
+                                                            Console.WriteLine("TCP Message sended:" + brainData);
+                                                            Task receiver = Task.Run(() =>
                                                             {
-                                                                brainData += SendQueue.Dequeue();
-                                                            }
-                                                            if (isConncted)
-                                                            {
-                                                                DC.sendData(brainData);
-                                                                Console.WriteLine("TCP Message sended:" + brainData);
-                                                            }
-                                                           
-                                                        }
-                                                }
+                                                                Console.WriteLine("Task start!");
+                                                                while (isConncted)
+                                                                {
+                                                                            DC.setReader();
+                                                                            var temp = DC.receiveResult();
+                                                                            Console.WriteLine("ANS:" + temp.ToString());
+                                                                            switch (temp.ToString())
+                                                                            {
+                                                                                case "0":
+                                                                                pictureBox2.InvokeIfRequired(() =>
+                                                                                {
+                                                                                    pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師.png");
+                                                                                });
+                                                                                break;
+                                                                                case "1":
+                                                                                pictureBox2.InvokeIfRequired(() =>
+                                                                                {
+                                                                                    pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師平靜.png");
+                                                                                });
+                                                                                break;
+                                                                                case "2":
+                                                                                    temp = "負面為激發";
+                                                                                    break;
+                                                                                case "3":
+                                                                                    temp = "負面激發";
+                                                                                    break;
+                                                                            }
+                                                                    
+                                                                }
+                                                                /*while(isConncted && (dataList.Count <= Times || infinity))
+                                                                {
+                                                                    
+                                                                }*/
+                                                            });
+                                                    }
+                                                    }
+                                            }
                                             }
                                             i++;
                                         }
-                                    DC.Dispose();
+                                        DC.Dispose();
                                 }
                             }
                         }
@@ -395,10 +427,11 @@ namespace WindowsFormsApp2
                             checkBox1.CheckState = CheckState.Unchecked;
                             label1.Text = "已經取消連接Server，請重新連線";
                         });
-
                     }
                 });
-         
+           
+  
+
             await t;
             if (tcpClient != null)
             {

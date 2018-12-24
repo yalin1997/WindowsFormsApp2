@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp2
 {
-    class Class1 : IDisposable
+    class filter<T>:IDisposable
     {
-        private List<double> outputQueue = new List<double>();
-        public Class1()
+        private List<T> outputQueue = new List<T>();
+        public int Count {
+            get => outputQueue.Count;
+        }
+        public filter()
         {
 
         }
-        public void addQueue(double input,int range)
+        public void addQueue(T input, int range)
         {
             Task.Run(() =>
             {
@@ -31,17 +34,25 @@ namespace WindowsFormsApp2
                 }
             });
         }
-        public int getAverage()
-        {
-            return (int)outputQueue.Average();
-        }
         public void Dispose()
         {
             outputQueue = null;
         }
-        public List<double> getList()
+        public List<T> getList()
         {
             lock (outputQueue) { return outputQueue; }
         }
+        public string Dequeue()
+        {
+            string temp = "";
+            var tempArr = outputQueue.ToArray();
+            for(int i = 0; i < Count; i++)
+            {
+                temp += tempArr[i];
+            }
+            return temp;
+         }
+        }
     }
-}
+
+
