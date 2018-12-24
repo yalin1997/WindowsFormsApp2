@@ -59,45 +59,5 @@ namespace WindowsFormsApp2.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 靈魂畫師 {
-            get {
-                object obj = ResourceManager.GetObject("靈魂畫師", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 靈魂畫師1 {
-            get {
-                object obj = ResourceManager.GetObject("靈魂畫師1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 靈魂畫師平靜 {
-            get {
-                object obj = ResourceManager.GetObject("靈魂畫師平靜", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 靈魂畫師平靜1 {
-            get {
-                object obj = ResourceManager.GetObject("靈魂畫師平靜1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }
