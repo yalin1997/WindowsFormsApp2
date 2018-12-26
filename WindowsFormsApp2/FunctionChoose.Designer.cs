@@ -34,35 +34,37 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(323, 267);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.BackColor = System.Drawing.Color.DodgerBlue;
+            this.button1.Font = new System.Drawing.Font("微軟正黑體", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.button1.ForeColor = System.Drawing.SystemColors.InactiveBorder;
+            this.button1.Location = new System.Drawing.Point(236, 188);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(397, 95);
+            this.button1.Size = new System.Drawing.Size(304, 199);
             this.button1.TabIndex = 0;
-            this.button1.Text = "開始資料蒐集";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Text = "開始";
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("新細明體", 50F);
-            this.label1.Location = new System.Drawing.Point(154, 109);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.ForeColor = System.Drawing.Color.OrangeRed;
+            this.label1.Location = new System.Drawing.Point(224, 90);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(791, 84);
+            this.label1.Size = new System.Drawing.Size(316, 67);
             this.label1.TabIndex = 2;
-            this.label1.Text = "專題之蒐集資料程式";
+            this.label1.Text = "Mental Out";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // FunctionChoose
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 562);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "FunctionChoose";
             this.Text = "FunctionChoose";
             this.ResumeLayout(false);

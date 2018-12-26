@@ -21,7 +21,7 @@ namespace WindowsFormsApp2
     {
         Stream stream;
         TcpClient tcpClient;
-        DeepLearn_Connector DC = new DeepLearn_Connector();
+        DeepLearn_Connector DC ;
         Boolean ready;
         //Task rawEgg;
         Pen bluePen = new Pen(Color.Blue);
@@ -85,9 +85,7 @@ namespace WindowsFormsApp2
             {
                 try
                 {
-                    //Console.WriteLine(inputJson);
                     IDictionary data = (IDictionary)JsonConvert.Import(typeof(IDictionary), inputJson);
-                    //Console.WriteLine(data);
 
 
                     if (data.Contains("eegPower") && data.Contains("eSense"))
@@ -112,7 +110,6 @@ namespace WindowsFormsApp2
                             {
                                 data.Add("Emotion", 3);
                             }
-                            //dataList.Add(data);
                         }
                         int signal = Int32.Parse(data["poorSignalLevel"].ToString());
                         label1.InvokeIfRequired(() =>
@@ -259,7 +256,6 @@ namespace WindowsFormsApp2
             }
             else
             {
-                //Console.WriteLine(" ------------------");
                 return "";
             }
         }
@@ -316,7 +312,7 @@ namespace WindowsFormsApp2
                 button1.Enabled=false;
                 count++;
                 ready = true;
-            bool isConncted = false;
+                bool isConncted = false;
                 int Times = Int32.Parse(textBox1.Text == "" ? "0" : textBox1.Text);
                  Boolean infinity = false;
                 if (Times == 0)
@@ -344,15 +340,20 @@ namespace WindowsFormsApp2
                                 {
                                     if (checkBox1.CheckState == CheckState.Checked && !isConncted)
                                     {
+                                        DC = new DeepLearn_Connector();
                                         isConncted = DC.Start_Connect("192.168.10.166", 8888);
                                     }
                                     while (dataList.Count <= Times || infinity)
-                                        {
+                                     {
                                             if (!ready)
                                             {
+                                                if (tcpClient != null)
+                                                {
+                                                    tcpClient.Close();
+                                                }
+                                                DC.Dispose();
                                                 break;
-                                            }
-                                            // This should really be in it's own thread                   
+                                            }                 
                                             bytesRead = stream.Read(buffer, 0, buffer.Length);
                                             string[] packets = Encoding.UTF8.GetString(buffer, 0, bytesRead).Split('\r');
                                             foreach (string json in packets)
@@ -383,38 +384,39 @@ namespace WindowsFormsApp2
                                                                             switch (temp.ToString())
                                                                             {
                                                                                 case "0":
-                                                                                pictureBox2.InvokeIfRequired(() =>
-                                                                                {
-                                                                                    pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師.png");
-                                                                                });
-                                                                                break;
+                                                                                    pictureBox2.InvokeIfRequired(() =>
+                                                                                    {
+                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師.png");
+                                                                                    });
+                                                                                    break;
                                                                                 case "1":
-                                                                                pictureBox2.InvokeIfRequired(() =>
-                                                                                {
-                                                                                    pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師平靜.png");
-                                                                                });
-                                                                                break;
+                                                                                    pictureBox2.InvokeIfRequired(() =>
+                                                                                    {
+                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師平靜.png");
+                                                                                    });
+                                                                                    break;
                                                                                 case "2":
-                                                                                    temp = "負面為激發";
+                                                                                    pictureBox2.InvokeIfRequired(() =>
+                                                                                    {
+                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "哀.png");
+                                                                                    });
                                                                                     break;
                                                                                 case "3":
-                                                                                    temp = "負面激發";
-                                                                                    break;
-                                                                            }
+                                                                                    pictureBox2.InvokeIfRequired(() =>
+                                                                                    {
+                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "怒.png");
+                                                                                    });
+                                                                                break;
+                                                                             }
                                                                     
                                                                 }
-                                                                /*while(isConncted && (dataList.Count <= Times || infinity))
-                                                                {
-                                                                    
-                                                                }*/
                                                             });
+                                                        }
                                                     }
-                                                    }
-                                            }
+                                                }
                                             }
                                             i++;
-                                        }
-                                        DC.Dispose();
+                                     }
                                 }
                             }
                         }
@@ -429,8 +431,6 @@ namespace WindowsFormsApp2
                         });
                     }
                 });
-           
-  
 
             await t;
             if (tcpClient != null)
@@ -913,7 +913,24 @@ namespace WindowsFormsApp2
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            checkBox1.CheckState = CheckState.Unchecked;
+        }
+
+        private void checkBox1_Click(object sender, EventArgs e)
+        {
+            switch (checkBox1.CheckState)
+            {
+                case CheckState.Checked:
+                    Console.WriteLine("click ="+checkBox1.CheckState.ToString());
+                    checkBox1.CheckState=CheckState.Checked;
+                    break;
+                case CheckState.Unchecked:
+                    Console.WriteLine("click =" + checkBox1.CheckState.ToString());
+                    checkBox1.CheckState = CheckState.Unchecked;
+                    break;
+                case CheckState.Indeterminate:
+                    
+                    break;
+            }
         }
     }
 }

@@ -37,6 +37,10 @@ namespace WindowsFormsApp2
                 f1.Show();
                 Close();
             }
+            else
+            {
+                label4.Text = "年齡請輸入數字";
+            }
 
         }
     }
