@@ -31,7 +31,10 @@ namespace WindowsFormsApp2
         }
         public void Dispose()
         {
-            stream.Close();
+            if (stream != null)
+            {
+                stream.Close();
+            }
             connector.Close();
         }
 

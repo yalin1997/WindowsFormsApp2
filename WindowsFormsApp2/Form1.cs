@@ -21,7 +21,7 @@ namespace WindowsFormsApp2
     {
         Stream stream;
         TcpClient tcpClient;
-        DeepLearn_Connector DC ;
+
         Boolean ready;
         //Task rawEgg;
         Pen bluePen = new Pen(Color.Blue);
@@ -338,9 +338,9 @@ namespace WindowsFormsApp2
                                 String tempText;
                                 using (DataSaver saver = new DataSaver(Path2 + name + year + "_"+count + ".txt"))
                                 {
+                                    DeepLearn_Connector DC = new DeepLearn_Connector();
                                     if (checkBox1.CheckState == CheckState.Checked && !isConncted)
                                     {
-                                        DC = new DeepLearn_Connector();
                                         isConncted = DC.Start_Connect("192.168.10.166", 8888);
                                     }
                                     while (dataList.Count <= Times || infinity)
@@ -351,7 +351,10 @@ namespace WindowsFormsApp2
                                                 {
                                                     tcpClient.Close();
                                                 }
-                                                DC.Dispose();
+                                                if (DC != null)
+                                                {
+                                                    DC.Dispose();
+                                                }
                                                 break;
                                             }                 
                                             bytesRead = stream.Read(buffer, 0, buffer.Length);
@@ -417,6 +420,7 @@ namespace WindowsFormsApp2
                                             }
                                             i++;
                                      }
+                                    DC.Dispose();
                                 }
                             }
                         }
@@ -431,7 +435,6 @@ namespace WindowsFormsApp2
                         });
                     }
                 });
-
             await t;
             if (tcpClient != null)
             {
