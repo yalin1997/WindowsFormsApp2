@@ -501,7 +501,7 @@
             // 
             // button8
             // 
-            this.button8.BackColor = System.Drawing.Color.LightSlateGray;
+            this.button8.BackColor = System.Drawing.Color.DimGray;
             this.button8.Cursor = System.Windows.Forms.Cursors.Hand;
             this.button8.FlatAppearance.BorderColor = System.Drawing.Color.RoyalBlue;
             this.button8.Font = new System.Drawing.Font("微軟正黑體", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));

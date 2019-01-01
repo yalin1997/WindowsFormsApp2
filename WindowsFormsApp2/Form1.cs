@@ -341,7 +341,7 @@ namespace WindowsFormsApp2
                                     DeepLearn_Connector DC = new DeepLearn_Connector();
                                     if (checkBox1.CheckState == CheckState.Checked && !isConncted)
                                     {
-                                        isConncted = DC.Start_Connect("192.168.10.166", 8888);
+                                        isConncted = DC.Start_Connect("140.127.74.131", 8888);
                                     }
                                     while (dataList.Count <= Times || infinity)
                                      {
@@ -367,8 +367,8 @@ namespace WindowsFormsApp2
                                                 {
                                                     saver.AddData(tempText);
 
-                                                    SendQueue.addQueue(tempText + "\n",5);
-                                                    if (SendQueue.Count >= 5)
+                                                    SendQueue.addQueue(tempText + "\n",6);
+                                                    if (SendQueue.Count >= 6)
                                                     {
                                                         string brainData;
                                                         brainData = SendQueue.Dequeue();
@@ -389,13 +389,15 @@ namespace WindowsFormsApp2
                                                                                 case "0":
                                                                                     pictureBox2.InvokeIfRequired(() =>
                                                                                     {
+                                                                                        Console.WriteLine("開心");
                                                                                         pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師.png");
                                                                                     });
                                                                                     break;
                                                                                 case "1":
                                                                                     pictureBox2.InvokeIfRequired(() =>
                                                                                     {
-                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師平靜.png");
+                                                                                        Console.WriteLine("平靜");
+                                                                                        pictureBox2.Image = Image.FromFile(Path2 + "靈魂畫師平靜1.png");
                                                                                     });
                                                                                     break;
                                                                                 case "2":
